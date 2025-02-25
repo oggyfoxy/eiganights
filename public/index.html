@@ -1,43 +1,361 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eiganights</title>
+    <style>
+        /* reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+        /* base styles */
+        body {
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #000;
+            background-color: #fff;
+            padding: 0 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+        /* barcode-like decoration */
+        .barcode {
+            height: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+        .barcode span {
+            display: inline-block;
+            width: 2px;
+            height: 20px;
+            background-color: #000;
+            margin-right: 1px;
+        }
+
+        /* header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* navigation */
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #000;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* main content */
+        main {
+            padding: 40px 0;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        h1 {
+            font-size: 28px;
+        }
+
+        h2 {
+            font-size: 22px;
+            margin-top: 40px;
+        }
+
+        /* movie grid */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .movie-card {
+            cursor: pointer;
+        }
+
+        .movie-card img {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 2/3;
+            background-color: #f0f0f0;
+            margin-bottom: 10px;
+        }
+
+        .movie-title {
+            font-weight: bold;
+        }
+
+        .movie-year {
+            color: #666;
+        }
+
+        /* scene annotation */
+        .scene-container {
+            margin-top: 40px;
+        }
+
+        .scene-card {
+            border: 1px solid #eee;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .scene-timestamp {
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .scene-annotation {
+            margin-bottom: 10px;
+        }
+
+        .scene-annotations-list {
+            margin-top: 30px;
+        }
+
+        /* form elements */
+        input, textarea, button {
+            font-family: 'Courier New', monospace;
+            padding: 10px;
+            margin-bottom: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #000;
+            color: #fff;
+            cursor: pointer;
+            width: auto;
+        }
+
+        button:hover {
+            background-color: #333;
+        }
+
+        /* search bar */
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        .search-container input {
+            width: 300px;
+        }
+
+        /* discussions */
+        .discussion-container {
+            margin-top: 40px;
+        }
+
+        .discussion-thread {
+            border-bottom: 1px solid #eee;
+            padding: 20px 0;
+        }
+
+        .discussion-author {
+            font-weight: bold;
+        }
+
+        .discussion-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .discussion-content {
+            margin-top: 10px;
+        }
+
+        /* utilities */
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .space-between {
+            justify-content: space-between;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- barcode decoration -->
+    <div class="barcode">
+        <!-- generate random barcode pattern -->
+        <script>
+            for (let i = 0; i < 100; i++) {
+                document.write(`<span style="width:${Math.random() > 0.7 ? 4 : 2}px"></span>`);
+            }
+        </script>
+    </div>
+
+    <header>
+        <div class="logo">eiganights</div>
+        <nav>
+            <a href="#home">home</a>
+            <a href="#library">library</a>
+            <a href="#explore">explore</a>
+            <a href="#profile">profile</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home">
+            <h1>welcome, user_xyz</h1>
+            
+            <div class="search-container">
+                <h2>search movies</h2>
+                <input type="text" placeholder="Search movies...">
+            </div>
+
+            <h2>recently annotated</h2>
+            <div class="movie-grid">
+                <div class="movie-card">
+                    <img src="#" alt="Movie poster">
+                    <div class="movie-title">paprika (2006)</div>
+                    <div class="movie-year">4 annotations</div>
+                </div>
+                <div class="movie-card">
+                    <img src="#" alt="Movie poster">
+                    <div class="movie-title">perfect blue (1997)</div>
+                    <div class="movie-year">2 annotations</div>
+                </div>
+                <div class="movie-card">
+                    <img src="#" alt="Movie poster">
+                    <div class="movie-title">akira (1988)</div>
+                    <div class="movie-year">7 annotations</div>
+                </div>
+                <div class="movie-card">
+                    <img src="#" alt="Movie poster">
+                    <div class="movie-title">ghost in the shell (1995)</div>
+                    <div class="movie-year">3 annotations</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="movie-detail" class="mt-20">
+            <h1>ghost in the shell (1995)</h1>
+            <div class="flex space-between">
+                <div>director: mamoru oshii</div>
+                <div>runtime: 83 min</div>
+            </div>
+
+            <div class="scene-container">
+                <h2>scene annotations</h2>
+                
+                <div class="scene-card">
+                    <div class="scene-timestamp">00:24:15 - 00:26:30</div>
+                    <div class="scene-annotation">
+                        the iconic dive scene - visual parallels with neuromancer's concept of "jacking in" to cyberspace. note the water as metaphor for digital consciousness.
+                    </div>
+                    <div class="flex space-between mt-20">
+                        <div>user: jdoe_92</div>
+                        <div>02 feb 2025</div>
+                    </div>
+                </div>
+
+                <div class="scene-card">
+                    <div class="scene-timestamp">00:42:18 - 00:44:22</div>
+                    <div class="scene-annotation">
+                        the boat scene conversation about what constitutes humanity mirrors the ship of theseus paradox - if all parts are replaced, is it still the same entity?
+                    </div>
+                    <div class="flex space-between mt-20">
+                        <div>user: cypherpunk01</div>
+                        <div>28 jan 2025</div>
+                    </div>
+                </div>
+
+                <h3 class="mt-20">add new annotation</h3>
+                <form>
+                    <div>
+                        <label for="timestamp-start">start time (hh:mm:ss)</label>
+                        <input type="text" id="timestamp-start" placeholder="00:00:00">
+                    </div>
+                    <div>
+                        <label for="timestamp-end">end time (hh:mm:ss)</label>
+                        <input type="text" id="timestamp-end" placeholder="00:00:00">
+                    </div>
+                    <div>
+                        <label for="annotation">your annotation</label>
+                        <textarea id="annotation" rows="5" placeholder="what did you notice about this scene?"></textarea>
+                    </div>
+                    <button type="submit">submit</button>
+                </form>
+            </div>
+
+            <div class="discussion-container">
+                <h2>discussions</h2>
+                
+                <div class="discussion-thread">
+                    <div class="flex space-between">
+                        <div class="discussion-author">neuraljack</div>
+                        <div class="discussion-date">17 feb 2025</div>
+                    </div>
+                    <div class="discussion-content">
+                        oshii's emphasis on reflections throughout the film creates a wonderful visual motif that reinforces the central identity questions. every mirror becomes a philosophical device.
+                    </div>
+                </div>
+
+                <div class="discussion-thread">
+                    <div class="flex space-between">
+                        <div class="discussion-author">filmtheory_22</div>
+                        <div class="discussion-date">12 feb 2025</div>
+                    </div>
+                    <div class="discussion-content">
+                        the use of background city scenes with minimal dialogue creates contemplative spaces where the viewer is forced to consider the implications of the narrative rather than being directly told.
+                    </div>
+                </div>
+
+                <h3 class="mt-20">join the discussion</h3>
+                <form>
+                    <textarea rows="4" placeholder="share your thoughts..."></textarea>
+                    <button type="submit">post</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- barcode decoration -->
+    <div class="barcode">
+        <script>
+            for (let i = 0; i < 100; i++) {
+                document.write(`<span style="width:${Math.random() > 0.7 ? 4 : 2}px"></span>`);
+            }
+        </script>
+    </div>
+</body>
 </html>
